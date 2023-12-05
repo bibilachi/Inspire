@@ -1,22 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
+
 
 public class AssemblerManager : MonoBehaviour
 {
-    private GameObject lastObject = null;
-    public List<GameObject> sequence;
+    private static int index = 1;
+    private static GameObject lastObject = null;
+    public static List<GameObject> sequence;
+    public List<GameObject> sequenceInitializer;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        sequence = sequenceInitializer;  // Primeiro, atribua um valor a sequence
+        lastObject = sequence[0];        // Em seguida, acesse sequence[0]
     }
 
-    // Update is called once per frame
-    void Update()
+    public static bool dropObject(GameObject obj)
     {
-        
+        if (obj == sequence[index])
+        {
+            index++;
+            obj.GetComponent<MeshRenderer>().enabled = true;
+            return true;
+        }
+        return false;
     }
 }
+
