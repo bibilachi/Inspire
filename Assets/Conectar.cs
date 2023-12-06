@@ -27,6 +27,7 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
             this.gameObject.SetActive(false);
             Debug.Log($"Objeto {fixedObject.name} foi acoplado.");
 
+
         }
 
 
