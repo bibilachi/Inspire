@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class AssemblerManager : MonoBehaviour
 {
-    private static int index = 1;
+    private static int index = 0;
     private static GameObject lastObject = null;
     public static List<GameObject> sequence;
     public List<GameObject> sequenceInitializer;
@@ -19,10 +19,11 @@ public class AssemblerManager : MonoBehaviour
 
     public static bool dropObject(GameObject obj)
     {
+        Debug.Log("Manager " + obj.gameObject + " " + sequence[index] + " " + index);
         if (obj == sequence[index])
         {
             index++;
-            obj.GetComponent<MeshRenderer>().enabled = true;
+            // obj.GetComponent<MeshRenderer>().enabled = true;
             return true;
         }
         return false;

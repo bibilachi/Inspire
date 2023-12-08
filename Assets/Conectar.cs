@@ -7,30 +7,47 @@ using UnityEngine.XR.Interaction.Toolkit.Transformers;
 
 public class Conectar : MonoBehaviour//, IXRGrabTransformer
 {
+    private Vector3 initialPosition;
+    private Quaternion initialRotation;
+
+    private Material material;
+    public Material hoverMaterial;
+    public Material targetMaterial;
+
     public GameObject fixedObject;
 
     private GameObject collisionObject;
     private static Conectar selectedConectar;
     bool flagCollision = false;
 
-    public void OnCollisionEnter(Collision collision)
+    public void Start()
+    {
+        initialPosition = this.transform.position;
+        initialRotation = this.transform.rotation;
+
+        material = fixedObject.GetComponent<MeshRenderer>().material;
+    }
+
+    public void OnTriggerEnter(Collider other)
     {
         flagCollision = true;
-        collisionObject = collision.gameObject;
-
-        
-
-        if (collisionObject.name == fixedObject.name)
+        if (other.gameObject == fixedObject)
         {
-            fixedObject.GetComponent<MeshRenderer>().enabled = true;
-            /*fixedObject.GetComponent <BoxCollider>().enabled = false;*/
-            this.gameObject.SetActive(false);
-            Debug.Log($"Objeto {fixedObject.name} foi acoplado.");
-
-
+            fixedObject.GetComponent<MeshRenderer>().material = hoverMaterial;
+            collisionObject = other.gameObject;
+            Debug.Log(this.gameObject.name + " Trigger ON com " + other.gameObject.name);
         }
+    }
 
-
+    public void OnTriggerExit(Collider other)
+    {
+        flagCollision = false;
+        if (other.gameObject == fixedObject)
+        {
+            fixedObject.GetComponent<MeshRenderer>().material = targetMaterial;
+            collisionObject = null;
+            Debug.Log(this.gameObject.name + " Trigger OFF com " + other.gameObject.name);
+        }
     }
 
     public void OnCollisionExit(Collision collision)
@@ -48,13 +65,16 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
     //void Process(XRGrabInteractable grabInteractable, XRInteractionUpdateOrder.UpdatePhase updatePhase, ref Pose targetPose, ref Vector3 localScale) { }
     //void OnUnlink(XRGrabInteractable grabInteractable) { }
 
-    public static void SelectedObject(SelectEnterEventArgs e)
+    public void SelectedObject()
     {
+        MeshRenderer mr = fixedObject.GetComponent<MeshRenderer>();
+        mr.enabled = true;
+        mr.material = targetMaterial;
         Debug.Log("CHAMOU AQUI: SelectedObject ");
-        GameObject obj = e.interactableObject.transform.gameObject;
-        Conectar con = obj.GetComponent<Conectar>();
-        if (con != null)
-            selectedConectar = con;
+        //GameObject obj = e.interactableObject.transform.gameObject;
+        //Conectar con = obj.GetComponent<Conectar>();
+        //if (con != null)
+        //    selectedConectar = con;
     }
 
 
@@ -67,12 +87,36 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
     public void dropObject()
     {
         Debug.Log("CHAMOU AQUI: dropObject ");
-        if (fixedObject != collisionObject)
-            return;
+        //if (fixedObject != collisionObject)
+        //    return;
 
-        if (AssemblerManager.dropObject(collisionObject))
+        //if (AssemblerManager.dropObject(collisionObject))
+        //{
+        //    this.gameObject.SetActive(false);
+        //}
+        if (collisionObject == null)
         {
+            this.transform.position = initialPosition;
+            this.transform.rotation = initialRotation;
+            fixedObject.GetComponent<MeshRenderer>().enabled = false;
+            Debug.Log($"Objeto {fixedObject.name} voltou ao inicio.");
+            return;
+        }
+
+        if (collisionObject.name == fixedObject.name && AssemblerManager.dropObject(collisionObject))
+        {
+            //fixedObject.GetComponent<MeshRenderer>().enabled = true;
+            /*fixedObject.GetComponent <BoxCollider>().enabled = false;*/
             this.gameObject.SetActive(false);
+            fixedObject.GetComponent<MeshRenderer>().material = material;
+            Debug.Log($"Objeto {fixedObject.name} foi acoplado.");
+        }
+        else
+        {
+            this.transform.position = initialPosition;
+            this.transform.rotation = initialRotation;
+            fixedObject.GetComponent<MeshRenderer>().enabled = false;
+            Debug.Log($"Objeto {fixedObject.name} voltou ao inicio.");
         }
     }
 }
