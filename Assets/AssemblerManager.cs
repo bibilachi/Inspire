@@ -11,7 +11,7 @@ public class AssemblerManager : MonoBehaviour
     public List<GameObject> sequenceInitializer;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         sequence = sequenceInitializer;  // Primeiro, atribua um valor a sequence
         lastObject = sequence[0];        // Em seguida, acesse sequence[0]
@@ -27,6 +27,11 @@ public class AssemblerManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public static GameObject NextObject()
+    {
+        return sequence[index];
     }
 }
 

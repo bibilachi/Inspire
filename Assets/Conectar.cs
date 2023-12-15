@@ -13,6 +13,7 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
     private Material material;
     public Material hoverMaterial;
     public Material targetMaterial;
+    public Material nextMaterial;
 
     public GameObject fixedObject;
 
@@ -20,12 +21,22 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
     private static Conectar selectedConectar;
     bool flagCollision = false;
 
+    public static List<Conectar> AllConectar = new List<Conectar>();
+
     public void Start()
     {
         initialPosition = this.transform.position;
         initialRotation = this.transform.rotation;
 
         material = fixedObject.GetComponent<MeshRenderer>().material;
+
+        AllConectar.Add(this);
+        ChangeMaterialToNext();
+    }
+
+    public void OnDestroy()
+    {
+        AllConectar.Remove(this);
     }
 
     public void OnTriggerEnter(Collider other)
@@ -109,6 +120,9 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
             /*fixedObject.GetComponent <BoxCollider>().enabled = false;*/
             this.gameObject.SetActive(false);
             fixedObject.GetComponent<MeshRenderer>().material = material;
+            GameObject nextObj = AssemblerManager.NextObject();
+            foreach(Conectar obj in AllConectar)
+                obj.ChangeMaterialToNext();
             Debug.Log($"Objeto {fixedObject.name} foi acoplado.");
         }
         else
@@ -117,6 +131,28 @@ public class Conectar : MonoBehaviour//, IXRGrabTransformer
             this.transform.rotation = initialRotation;
             fixedObject.GetComponent<MeshRenderer>().enabled = false;
             Debug.Log($"Objeto {fixedObject.name} voltou ao inicio.");
+        }
+    }
+
+    public void ChangeMaterialToNext()
+    {
+        Debug.Log(this.gameObject.name + " " + fixedObject.name + " " + AssemblerManager.NextObject().name);
+        if (fixedObject == AssemblerManager.NextObject())
+        {
+            Debug.Log("Hello");
+            MeshRenderer[] mrList = this.gameObject.GetComponents<MeshRenderer>();
+            foreach (var mr in mrList)
+            {
+                Debug.Log("A " + mr.gameObject.name);
+                mr.material = nextMaterial;
+            }
+
+            mrList = this.gameObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (var mr in mrList)
+            {
+                Debug.Log("A " + mr.gameObject.name);
+                mr.material = nextMaterial;
+            }
         }
     }
 }
